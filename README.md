@@ -1,28 +1,52 @@
 AndroidContext
 ==============
 
-Appcelerator Titanium code to fire paused/resumed events in Android.
+Titanium Classic code to fire paused/resumed events in Android.
 
 ## How to use
 
-Put the Context.js in your `app/lib` folder and register every activity with Android Context:
+Put Context.js in your `Resources` folder. *Every time you open a new window*, you must call `Context.track(win)`.
 
 ```
-<Alloy>
-	<Window onOpen="onOpen" onClose="onClose" />
-</Alloy>
-```
+var Context = require ('/Context');
 
-```
-var Context = require('Context');
+function SimpleWindow ()
+{
+    var _self;
+    
+    _self = Ti.UI.createWindow ({
+        backgroundColor: '#fff'
+    });
+    
+    Context.track (_self);
 
-function onOpen(evt) {
-	Context.on('activityName1', this.activity);
+    var b = Ti.UI.createButton ({
+        color: '#000',
+        title: 'click me'
+    });
+    
+    _self.add (b);
+    
+    b.addEventListener ('click', function (e) {
+        var w = new SimpleWindow ();
+        w.open ();
+    });
+        
+    return _self;
 }
 
-function onClose(evt) {
-	Context.off('activityName1');
-}
+
+Ti.App.addEventListener ('paused', function (e) {
+    Ti.API.debug ('app paused');
+});
+
+Ti.App.addEventListener ('resumed', function (e) {
+    Ti.API.debug ('app resumed');
+});
+
+var w = new SimpleWindow ();
+w.open ();
+
 ```
 
-Android Context will keep track of which Activity is currently active and will fire the `paused` and `resumed` events appropriately, when the app goes into the background / comes into foreground. Does currently not support `pause` and `resume`.
+Android Context will keep track of which Activity is currently active and will fire the `paused` and `resumed` events appropriately, when the app goes into the background / comes into foreground.  Unlike some other solutions out there, it will fire these events when the screen is turned off and on.
