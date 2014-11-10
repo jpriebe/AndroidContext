@@ -1,18 +1,17 @@
 var _activeActivity;
 
-function generate_guid ()
+var _activitycount = 0;
+
+function generate_name ()
 {
-    var guid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-        return v.toString(16);
-    });
+    _activitycount++;
     
-    return guid;
+    return "activity-" + _activitycount;
 }
 
 function on_open (w) 
 {
-    var name = w.context_guid;
+    var name = w.context_id;
     var activity = w.activity;
     
     activity.onStart = function() {
@@ -43,7 +42,7 @@ function Context ()
 }
 
 Context.track = function (win) {
-    win.context_guid = generate_guid ();
+    win.context_id = generate_name ();
     win.addEventListener ('open', function (e) { on_open (win); });
     win.addEventListener ('close', function (e) { on_close (win); });
 };
